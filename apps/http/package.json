@@ -2,8 +2,9 @@
   "name": "http",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "build": "tsc -b",
+    "build": "npx tsc -b",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js"
   },
@@ -15,13 +16,13 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "tsx": "^4.21.0"
+    "cookie-parser": "^1.4.7"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
-    "cookie-parser": "^1.4.7"
+    "tsx": "^4.21.0"
   },
   "keywords": [],
   "author": "",

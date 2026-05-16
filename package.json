@@ -4,12 +4,15 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prisma:generate": "cd packages/db && pnpm run generate",
+    "start:be": "cd apps/http && pnpm run start"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "turbo": "^2.9.12"
+    "turbo": "^2.9.12",
+    "typescript": "5.5.4"
   },
   "packageManager": "pnpm@8.15.6",
   "name": "with-vite-react"

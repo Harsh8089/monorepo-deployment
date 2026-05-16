@@ -1,9 +1,9 @@
 import express, { NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import prisma from "@repo/db";
 import cors from "cors";
 import 'dotenv/config';
-import prisma from "@repo/db";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
