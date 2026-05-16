@@ -1,32 +1,43 @@
-# `Turborepo` Vite starter
+### [Prisma in Monorepo (v6.3.1)](https://github.com/Harsh8089/monorepo-deployment/commit/2adabfa4a06e3a9f56beb35903324e39b2720fd3)
 
-This is a community-maintained example. If you experience a problem, please submit a pull request with a fix. GitHub Issues will be closed.
+- Prisma v6.3.1 doesn't require `output` path in `schema.prisma`. Generates prisma client to `node_modules/.prisma/client` by default.
+- Import from `@prisma/client` in `packages/db/src/index.ts` (not a relative generated path).
+- Run `prisma generate` explicitly — in CI, Docker, and any fresh environment.
+  (it does not run automatically on `pnpm install`)
+- `packages/db/package.json` exports must point to compiled JS for prod:
 
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest -e with-vite-react
+```json
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
 ```
 
-## What's inside?
+Pointing exports to `./src/index.ts` works in dev (tsx handles .ts)
+but breaks in prod (plain node cannot run .ts files).
 
-This Turborepo includes the following packages and apps:
+### [Dockerfile for http](https://github.com/Harsh8089/monorepo-deployment/commit/2adabfa4a06e3a9f56beb35903324e39b2720fd3#diff-1889a39cd8e5503a22aa01cf4e8f67d491cedd51f11a10d7893f454ab298560b)
 
-### Apps and Packages
+- `.dockerignore` file must be created at root level
+- prisma client must be re-generated in docker container
+- Added script to start http server at root package.json
+- Copies entire workspace
+- Image build command
 
-- `web`: react [vite](https://vitejs.dev) ts app
-- `@repo/ui`: a stub component library shared by `web` application
-- `@repo/eslint-config`: shared `eslint` configurations
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+```bash
+docker build -f apps/http/Dockerfile.backend -t backend .
+```
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+- Image run command
 
-### Utilities
+```bash
+docker run -p 3000:3000 backend
+```
 
-This Turborepo has some additional tools already setup for you:
+- If need shell access
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+```bash
+docker exec -it <container-name> /bin/sh
+```
