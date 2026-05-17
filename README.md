@@ -96,3 +96,16 @@ Access application on browser at - http://localhost:5173
 ```bash
 docker compose up --build
 ```
+
+### Note
+
+**Environment vars**
+
+1. They are not needed when we are building images
+2. Need when container is created from build image
+
+**Prisma client, migrate and deploy**
+
+1. Prisma client is dep, hence needed for building image
+2. Migrate - creates migration files (with the help of schema.prisma) + applies them to the db specified in `DATABASE_URL`
+3. Deploy - only applies existing migration files, never creates

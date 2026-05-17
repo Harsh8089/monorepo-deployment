@@ -4,12 +4,23 @@ WORKDIR /usr/src
 
 RUN npm install -g pnpm@9.12.1
 
-COPY . .
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN pnpm install --frozen-lockfile
+COPY apps/web/package.json                           ./apps/web/
+COPY packages/typescript-config/package.json         ./packages/typescript-config/
+COPY packages/eslint-config/package.json             ./packages/eslint-config/
+COPY packages/ui/package.json                        ./packages/ui/
 
-RUN pnpm build
+RUN pnpm install --frozen-lockfile --filter web...
+
+COPY apps/web                     ./apps/web
+COPY packages/db                  ./packages/db
+COPY packages/typescript-config   ./packages/typescript-config
+COPY packages/eslint-config       ./packages/eslint-config
+COPY packages/ui                  ./packages/ui
+
+RUN pnpm --filter web build
 
 EXPOSE 5173
 
-CMD ["pnpm", "start:fe"]
+CMD ["sh", "-c", "pnpm --filter web dev"]
