@@ -48,3 +48,45 @@ docker exec -it <container-name> /bin/sh
 - Create a network
 - Attach created n/w to backend and postgres container
 - Pass DATABASE_URL to backend image to turn up container
+
+### Dev docker setup
+
+Run below steps at root level
+
+1. Create n/w connection b/w http server and postgres sql
+
+```bash
+docker network create http-db
+```
+
+2. Run postgres image, attach n/w, pass env var and set name as sql
+
+```bash
+docker run --name sql -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pswd -e POSTGRES_DB=db -d --network http-db -p 5432:5432 postgres
+```
+
+3. Build backend image
+
+```bash
+docker build -f apps/http/Dockerfile.backend -t backend .
+```
+
+4. Run backend image, attach n/w, pass db url as env and set name as backend
+
+```bash
+docker run --name backend -e DATABASE_URL="postgresql://user:pswd@sql:5432/db" -e JWT_SECRET="some_random_123#_jwt_secret!" -e PORT=3000 -d -p 3000:3000 backend
+```
+
+5. Build frontend image
+
+```bash
+docker build -f apps/web/Dockerfile.frontend -t frontend .
+```
+
+6. Run frontend image, attach n/w
+
+```bash
+docker run --name frontend -d --network http-db -p 5173:5173 frontend
+```
+
+Access application on browser at - http://localhost:5173
