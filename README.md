@@ -51,7 +51,7 @@ docker exec -it <container-name> /bin/sh
 
 ### Dev docker setup
 
-Run below steps at root level
+**Option 1** - Run below steps at root level
 
 1. Create n/w connection b/w http server and postgres sql
 
@@ -90,3 +90,9 @@ docker run --name frontend -d --network http-db -p 5173:5173 frontend
 ```
 
 Access application on browser at - http://localhost:5173
+
+**Option-2** - Using docker compose (single command)
+
+```bash
+docker compose up --build
+```

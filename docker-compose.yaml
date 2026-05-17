@@ -1,0 +1,52 @@
+services:
+  sql:
+    image: postgres
+    env_file: ".env"
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+    ports:
+      - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    depends_on:
+      sql:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: apps/http/Dockerfile.backend
+    env_file: ".env"
+    environment:
+      - DATABASE_URL=$DATABASE_URL
+      - PORT=$NODE_LOCAL_PORT
+      - JWT_SECRET=$JWT_SECRET
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    networks:
+      - web
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.frontend
+    ports:
+      - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
+    networks:
+      - web
+
+volumes:
+  postgres-data:
+
+networks:
+  web:
+    driver: bridge
