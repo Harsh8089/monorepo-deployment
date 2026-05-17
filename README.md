@@ -42,3 +42,9 @@ docker run -p 3000:3000 backend
 ```bash
 docker exec -it <container-name> /bin/sh
 ```
+
+### Backend container connection with postgresql
+
+- Create a network
+- Attach created n/w to backend and postgres container
+- Pass DATABASE_URL to backend image to turn up container

@@ -5,8 +5,10 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prisma:generate": "cd packages/db && pnpm run generate",
-    "start:be": "cd apps/http && pnpm run start"
+    "prisma:generate": "cd packages/db && pnpm run generate", 
+    "prisma:migrate:deploy": "cd packages/db && pnpm run migrate:deploy",
+    "start:be": "pnpm run prisma:migrate:deploy && cd apps/http && pnpm run start",
+    "start:fe": "cd apps/web && pnpm dev"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
