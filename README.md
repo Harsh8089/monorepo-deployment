@@ -24,6 +24,7 @@ but breaks in prod (plain node cannot run .ts files).
 - prisma client must be re-generated in docker container
 - Added script to start http server at root package.json
 - Copies entire workspace
+- While running db, attach volume to make data persistent in postgres container (optional), or else run `npx prisma migrate dev` to sync current migrations in newly created postgres container
 - Image build command
 
 ```bash

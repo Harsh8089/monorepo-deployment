@@ -50,6 +50,10 @@ router.get("/health-check", async (_, res) => {
   res.send("OK");
 });
 
+router.get("/auth/me", auth, (req, res) => {
+  res.json((req as any).user);
+})
+
 router.post("/register", async (req, res) => {
   const { username, password } = req.body as { username: string, password: string };
 
