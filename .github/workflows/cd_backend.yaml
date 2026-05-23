@@ -24,6 +24,7 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: SSH connection
