@@ -33,7 +33,7 @@ jobs:
           ssh -i PRIVATE_KEY -o StrictHostKeyChecking=no ${{ secrets.HOST_NAME }}@${{ secrets.HOST_IP }} << 'EOF'  
             echo "${{ secrets.DOCKER_PAT }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-            docker image prune -af 
+            docker system prune -af --volumes 
 
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
 
