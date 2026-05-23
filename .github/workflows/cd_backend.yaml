@@ -1,4 +1,8 @@
+# Steps -
+# Checkout latest code
 # Build docker image
+# Publish image
+# SSH into VM, pull latest image and start container
 
 name: CD Backend
 
