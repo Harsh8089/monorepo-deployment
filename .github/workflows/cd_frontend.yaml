@@ -22,7 +22,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_PAT }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build docker image
-        run: docker build -f apps/web/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }} .
+        run: docker build --build-arg BACKEND_URL=${{ secrets.BACKEND_URL }} -f apps/web/Dockerfile.frontend -t ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }} .
 
       - name: Push image to docker hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }}
