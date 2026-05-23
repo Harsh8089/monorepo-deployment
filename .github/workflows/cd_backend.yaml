@@ -18,4 +18,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build backend docker image
-        run: docker build -f apps/http/Dockerfile.backend -t backend .
+        run: docker build \
+          -f apps/http/Dockerfile.backend \
+          -t ${{ secrets.DOCKER_USERNAME }}/backend:latest .
+
+      - name: Push docker image to docker hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
