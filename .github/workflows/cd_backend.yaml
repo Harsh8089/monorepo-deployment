@@ -38,7 +38,12 @@ jobs:
           ssh -i PRIVATE_KEY -o StrictHostKeyChecking=no ${{ secrets.HOST_NAME }}@${{ secrets.HOST_IP }} << 'EOF'  
             echo "${{ secrets.DOCKER_PAT }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-            docker system prune -af --volumes 
+            # Stop and remove only the backend container
+            docker stop backend || true
+            docker rm backend || true
+
+            # Remove only old backend images (keeps other service images intact)
+            docker images "${{ secrets.DOCKER_USERNAME }}/backend" -q | xargs -r docker rmi -f || true
 
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
 
