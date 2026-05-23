@@ -1,0 +1,21 @@
+# Build docker image
+
+name: CD Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to dockerhub
+        run: echo "${{ secrets.DOCKER_PAT }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build backend docker image
+        run: docker build -f apps/http/Dockerfile.backend -t backend .
