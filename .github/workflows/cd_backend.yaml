@@ -1,9 +1,3 @@
-# Steps -
-# Checkout latest code
-# Build docker image
-# Publish image
-# SSH into VM, pull latest image and start container
-
 name: CD Backend
 
 on:
@@ -15,37 +9,51 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to dockerhub
+      - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_PAT }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build backend docker image
-        run: docker build -f apps/http/Dockerfile.backend -t ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }} .
+      - name: Build backend Docker image
+        run: |
+          docker build \
+            -f apps/http/Dockerfile.backend \
+            -t ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }} \
+            .
 
-      - name: Push docker image to docker hub
+      - name: Push image to DockerHub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: SSH connection
+      - name: Deploy to EC2
         run: |
           printf "%s" "${{ secrets.SSH_PEM }}" > PRIVATE_KEY
           chmod 600 PRIVATE_KEY
-          ssh -i PRIVATE_KEY -o StrictHostKeyChecking=no ${{ secrets.HOST_NAME }}@${{ secrets.HOST_IP }} << 'EOF'  
+
+          ssh -i PRIVATE_KEY \
+            -o StrictHostKeyChecking=no \
+            ${{ secrets.HOST_NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+
             echo "${{ secrets.DOCKER_PAT }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
             # Stop and remove only the backend container
             docker stop backend || true
-            docker rm backend || true
+            docker rm backend   || true
 
             # Remove only old backend images (keeps other service images intact)
             docker images "${{ secrets.DOCKER_USERNAME }}/backend" -q | xargs -r docker rmi -f || true
 
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
 
-            docker run --name backend -d -e "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}" -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
+            docker run \
+              --name backend \
+              -d \
+              -e "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}" \
+              -e "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+              -p 3000:3000 \
+              ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
           EOF
